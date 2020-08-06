@@ -4,20 +4,11 @@ pyfiscalprinter
 Drivers for invoice/tickets fiscal printers (Epson &amp; Hasar) Argentina
 
 
-# Construcción de ejecutable
-
-## Windows
+# Construcción de instalador de servicio para windows
 
 ```
-docker run -it --rm -v $PWD:/src cdrx/pyinstaller-windows:python2
+docker build --tag epsonFiscalDriver-wininstall -f windows/Dockerfile .
+docker run -it --rm -v $PWD/dist:/output epsonFiscalDriver-wininstall
 ```
 
-Genera `epsonFiscalDriver.exe` en `dist/windows`
-
-## Linux
-
-```
-docker run -it --rm -v $PWD:/src cdrx/pyinstaller-linux:python2
-```
-
-Genera `epsonFiscalDrive` en `dist/linux`
+Va a construir un binario portable para el driver y generar un instalador del servicio utilizando Innosetup y NSSM.
