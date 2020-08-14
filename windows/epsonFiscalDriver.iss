@@ -18,7 +18,7 @@ Source: "dist\windows\epsonFiscalDriver.exe"; DestDir: "{app}"
 
 [Icons]
 Name: "{group}\Configurar servicio epsonFiscalDriver"; Filename: "{app}\nssm.exe"; WorkingDir: "{app}"; Parameters: "edit epsonFiscalDriver"
-Name: "{group}\Reiniciar servicio epsonFiscalDriver"; Filename: "{app}\nssm.exe"; WorkingDir: "{app}"; Parameters: "restart epsonFiscalDriver"
+Name: "{group}\Reiniciar servicio epsonFiscalDriver"; Filename: "{app}\restartservice.bat"; WorkingDir: "{app}"
 
 [Run]
 Filename: "{app}\installservice.bat"; \
