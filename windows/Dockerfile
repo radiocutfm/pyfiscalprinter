@@ -30,7 +30,7 @@ COPY --from=builder /source/dist /work/dist
 
 RUN curl -fsSl -o nssm-2.24.zip https://nssm.cc/release/nssm-2.24.zip \
     && unzip nssm-2.24.zip \
-    && cp nssm-2.24/win64/nssm.exe /work \
+    && cp nssm-2.24/win32/nssm.exe /work \
     && iscc epsonFiscalDriver.iss
 
 
