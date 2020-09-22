@@ -15,6 +15,7 @@ ArchitecturesInstallIn64BitMode=x64
 Source: "nssm.exe"; DestDir: "{app}"
 Source: "restartservice.ps1"; DestDir: "{app}"
 Source: "installservice.ps1"; DestDir: "{app}"
+Source: "testservice.ps1"; DestDir: "{app}"
 Source: "dist\windows\epsonFiscalDriver.exe"; DestDir: "{app}"
 
 [Icons]
