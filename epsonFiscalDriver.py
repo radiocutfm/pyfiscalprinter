@@ -9,7 +9,7 @@ import socket
 import traceback
 
 def debugEnabled( *args ):
-    print >>sys.stderr, " ".join( map(str, args) )
+    print >>sys.stderr, " ".join([repr(a) for a in args])
 
 def debugDisabled( *args ):
     pass
@@ -17,7 +17,11 @@ def debugDisabled( *args ):
 debug = debugDisabled
 
 class PrinterException(Exception):
-    pass
+    def __init__(self, msg):
+        self.msg = msg
+
+    def __str__(self):
+        return self.msg.encode(sys.stdout.encoding, errors="ignore")
 
 class UnknownServerError(PrinterException):
     errorNumber = 1
@@ -105,11 +109,11 @@ class EpsonFiscalDriver:
         message = chr(0x02) + chr( self._sequenceNumber ) + chr(commandNumber)
         if fields:
             message += chr(0x1c)
-        message += chr(0x1c).join( fields )
+        message += str(chr(0x1c).join( fields ))
         message += chr(0x03)
         checkSum = sum( [ord(x) for x in message ] )
         checkSumHexa = ("0000" + hex(checkSum)[2:])[-4:].upper()
-        message += checkSumHexa
+        message += str(checkSumHexa)
         reply = self._sendMessage( message )
         self._incrementSequenceNumber()
         return self._parseReply( reply, skipStatusErrors )
@@ -226,9 +230,9 @@ class HasarFiscalDriver( EpsonFiscalDriver ):
                           (1<<8, "Tapa de impresora abierta"),
                           ]
 
-    ACK = chr(0x06)
-    NAK = chr(0x15)
-    STATPRN = chr(0xa1)
+    ACK = b'\x06'
+    NAK = b'\x15'
+    STATPRN = b'\xa1'
 
     def _initSequenceNumber( self ):
         self._sequenceNumber = random.randint( 0x20, 0x7f )
@@ -474,6 +478,7 @@ if __name__ == "__main__":
         ret = socketServer( opts.printerType, opts.ip, int(opts.port), opts.deviceFile, int(opts.speed), int(opts.timeout) )
     else:
         ret = runServer( opts.printerType, sys.stdin, sys.stdout, opts.deviceFile, int(opts.speed) )
+
     sys.exit( ret )
 
 
