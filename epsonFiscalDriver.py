@@ -8,6 +8,9 @@ import SocketServer
 import socket
 import traceback
 
+
+OUTPUT_ENCODING = 'latin1'
+
 def debugEnabled( *args ):
     print >>sys.stderr, " ".join([repr(a) for a in args])
 
@@ -16,12 +19,17 @@ def debugDisabled( *args ):
 
 debug = debugDisabled
 
+
 class PrinterException(Exception):
     def __init__(self, msg):
         self.msg = msg
 
     def __str__(self):
-        return self.msg.encode(sys.stdout.encoding, errors="ignore")
+        return self.msg.encode(OUTPUT_ENCODING, errors="ignore")
+
+    def __unicode__(self):
+        return self.msg
+
 
 class UnknownServerError(PrinterException):
     errorNumber = 1
@@ -82,7 +90,7 @@ class EpsonFiscalDriver:
 
     def _write( self, s ):
         if isinstance(s, unicode):
-            s = s.encode("latin1")
+            s = s.encode(OUTPUT_ENCODING)
         debug( "_write", ", ".join( [ "%x" % ord(c) for c in s ] ) )
         self._serialPort.write( s )
 
@@ -413,11 +421,11 @@ def runServer( printerType, fileIn, fileOut, deviceFile, speed = 9600 ):
         try:
             reply = p.sendCommand( commandNumber, parameters, skipStatusErrors )
         except PrinterException, e:
-            fileOut.write( "ERROR: %02d %s\n" % (e.errorNumber, str(e)) )
+            fileOut.write( ("ERROR: %02d %s\n" % (e.errorNumber, e)).encode(OUTPUT_ENCODING) )
         except Exception, e:
-            fileOut.write( "ERROR: %02d %s\n" % (1, str(e)) )
+            fileOut.write( ("ERROR: %02d %s\n" % (1, e)).encode(OUTPUT_ENCODING) )
         else:
-            fileOut.write( "REPLY: %s\n" % reply )
+            fileOut.write( ("REPLY: %s\n" % reply).encode(OUTPUT_ENCODING) )
         fileOut.flush()
     p.close()
 
