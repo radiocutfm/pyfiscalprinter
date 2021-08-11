@@ -1,0 +1,18 @@
+# Servicio para driver fiscal
+
+El servicio que se instala es una plantilla de systemd.
+
+Para iniciar la instancia predeterminada:
+
+    systemctl start epsonFiscalDriver@default
+
+
+Para configurar distintas instancias:
+
+    systemctl start epsonFiscalDriver@fiscal1
+    systemctl start epsonFiscalDriver@fiscal2
+
+
+Cada instancia leerá su configuración de `/etc/epsonFiscalDriver.d/<INSTANCIA>.conf`.
+
+Ver el archivo de configuración default para conocer las opciones disponibles, y `/opt/epsonFiscalDriver/epsonFiscalDriver --help` para mas detalles de los argumentos que acepta el driver.

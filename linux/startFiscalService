@@ -1,0 +1,46 @@
+#!/bin/sh
+
+# Inicia epsonFiscalDriver usando configuración de /etc/epsonFiscalDriver.d
+
+set -e
+
+if [ $# -eq 0 ]; then
+    echo "WARNING: no se especificó una instancia, asumiendo default"
+    INSTANCE=default
+else
+    INSTANCE=$1
+fi
+
+CONFIG="/etc/epsonFiscalDriver.d/${INSTANCE}.conf"
+
+if [ -f "$CONFIG" ]; then
+    . "$CONFIG"
+fi
+
+if [ -z "$TYPE" ]; then
+    echo "ERROR: se debe especificar el tipo de impresora en $CONFIG" >&2
+    exit 11
+fi
+
+if [ -z "$DEVICE" ]; then
+    echo "WARNING: no se específico un dispositivo, se intentará determinar automáticamente"
+    for candidate in /dev/ttyUSB? /dev/ttyACM? /dev/ttyS?; do
+        if [ -c "$candidate" ]; then
+            DEVICE="$candidate"
+            break
+        fi
+    done
+
+fi
+
+if [ -z "$DEVICE" ]; then
+    echo "ERROR: No se pudo determinar el dispositivo a usar para la instancia $INSTANCE. Verifique la configuración en $CONFIG." >&2
+    exit 10
+fi
+
+if [ -z "$PORT" ]; then
+    echo "WARNING: No se indicó un puerto a utilizar, se asume puerto 12345"
+    PORT=12345
+fi
+
+exec /opt/epsonFiscalDriver/epsonFiscalDriver -d $DEVICE -t $TYPE -p $PORT $EXTRA_ARGS

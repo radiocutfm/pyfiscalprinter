@@ -1,0 +1,28 @@
+#!/bin/sh
+
+# Installs package to /opt/epsonFiscalDriver and service unit
+
+set -e
+
+if [ $(id -u) -ne 0 ]; then
+    echo "ERROR: superuser required for this install" >&2
+    exit 10
+fi
+
+PACKAGE=epsonFiscalDriver
+
+umask 0022
+
+cp -rp ${PACKAGE} /opt
+
+cp /opt/${PACKAGE}/${PACKAGE}@.service /lib/systemd/system || {
+    echo "ERROR: failed to install systemd unit. You can install it manually from /opt/${PACKAGE}" >&2
+}
+
+mkdir -p /etc/${PACKAGE}.d
+
+cp /opt/${PACKAGE}/default.conf /etc/${PACKAGE}.d
+
+systemctl daemon-reload
+
+systemctl enable epsonFiscalDriver@default.service

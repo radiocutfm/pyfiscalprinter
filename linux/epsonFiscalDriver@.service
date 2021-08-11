@@ -1,0 +1,11 @@
+[Unit]
+Description=Driver fiscal %I
+
+[Service]
+Type=simple
+ExecStart=/opt/epsonFiscalDriver/startFiscalService %i
+Restart=no
+
+[Install]
+WantedBy=multi-user.target
+DefaultInstance=default
