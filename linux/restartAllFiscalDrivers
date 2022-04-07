@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# Reinicia todos los servicios de driver fiscal configurados
+
+for config in /etc/epsonFiscalDriver.d/*.conf; do
+    service="$(basename $config .conf)"
+    echo "Reiniciando driver $service"
+    systemctl restart "epsonFiscalDriver@$service"
+done
+
+
+echo "\n\n"
+read -p "Presione ENTER para finalizar" DUMMY

@@ -48,6 +48,8 @@ RUN mkdir -p /work/package \
     && cp linux/startFiscalService package/epsonFiscalDriver \
     && cp linux/default.conf package/epsonFiscalDriver \
     && cp linux/README package/epsonFiscalDriver \
+    && cp linux/restartAllFiscalDrivers package/epsonFiscalDriver \
+    && cp linux/restartAllFiscalDrivers.desktop package/epsonFiscalDriver \
     && cp -rp linux/setup package \
     && makeself.sh package epsonFiscalDriver.run "Servicio epsonFiscalDriver" ./setup
 

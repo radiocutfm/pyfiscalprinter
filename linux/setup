@@ -13,6 +13,7 @@ PACKAGE=epsonFiscalDriver
 
 umask 0022
 
+rm -fr "/opt/${PACKAGE}"
 cp -rp ${PACKAGE} /opt
 
 cp /opt/${PACKAGE}/${PACKAGE}@.service /lib/systemd/system || {
@@ -21,7 +22,12 @@ cp /opt/${PACKAGE}/${PACKAGE}@.service /lib/systemd/system || {
 
 mkdir -p /etc/${PACKAGE}.d
 
-cp /opt/${PACKAGE}/default.conf /etc/${PACKAGE}.d
+if ! [ -f /etc/${PACKAGE}.d/default.conf ]; then
+    cp /opt/${PACKAGE}/default.conf /etc/${PACKAGE}.d
+fi
+
+cp /opt/${PACKAGE}/restartAllFiscalDrivers.desktop /usr/share/applications/
+update-desktop-database || echo "Falló la actualización de desktop database"
 
 systemctl daemon-reload
 

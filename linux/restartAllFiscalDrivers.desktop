@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Reiniciar driver fiscal epsonFiscalDriver
+Type=Application
+Comment=Reiniciar driver fiscal epsonFiscalDriver
+Exec=bash -c "sudo /opt/epsonFiscalDriver/restartAllFiscalDrivers"
+Icon=utilities-terminal
+Categories=System;
+Path=/opt/epsonFiscalDriver
+Terminal=true
