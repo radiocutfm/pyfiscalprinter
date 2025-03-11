@@ -14,8 +14,8 @@ $pwd = (Get-Location).Path
 $restartPath = "$pwd\Fierro-fiscalRestart\dist\fiscalRestart"
 .\nssm.exe install FiscalRestart "$restartPath\fiscalRestart.exe"
 .\nssm.exe set FiscalRestart AppDirectory $restartPath
-.\nssm.exe set FiscalRestart AppStdout C:\Fierro-fiscalRestart\log.txt
-.\nssm.exe set FiscalRestart AppStderr C:\Fierro-fiscalRestart\log.txt
+.\nssm.exe set FiscalRestart AppStdout "$pwd\Fierro-fiscalRestart\log.txt"
+.\nssm.exe set FiscalRestart AppStderr "$pwd\Fierro-fiscalRestart\log.txt"
 .\nssm.exe set FiscalRestart AppStdoutCreationDisposition 4
 .\nssm.exe set FiscalRestart AppStderrCreationDisposition 4
 .\nssm.exe set FiscalRestart AppRotateFiles 1
