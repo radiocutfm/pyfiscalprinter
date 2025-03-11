@@ -1,7 +1,7 @@
 [Setup]
 AppName=epsonFiscalDriver
 OutputBaseFilename=InstallEpsonFiscalDriver
-AppVersion=1.1.12
+AppVersion=1.2.0
 WizardStyle=modern
 DefaultDirName={autopf}\epsonFiscalDriver
 DefaultGroupName=epsonFiscalDriver
@@ -17,6 +17,7 @@ Source: "restartservice.ps1"; DestDir: "{app}"
 Source: "installservice.ps1"; DestDir: "{app}"
 Source: "testservice.ps1"; DestDir: "{app}"
 Source: "dist\windows\epsonFiscalDriver.exe"; DestDir: "{app}"
+Source: "Fierro-fiscalRestart\*"; DestDir: "{app}\Fierro-fiscalRestart"; Flags: recursesubdirs
 
 [Icons]
 Name: "{group}\Configurar servicio epsonFiscalDriver"; Filename: "{app}\nssm.exe"; WorkingDir: "{app}"; Parameters: "edit epsonFiscalDriver"
@@ -35,6 +36,10 @@ Filename: "{app}\nssm.exe"; \
     Parameters: "stop epsonFiscalDriver"
 Filename: "{app}\nssm.exe"; \
     Parameters: "remove epsonFiscalDriver confirm"
+Filename: "{app}\nssm.exe"; \
+    Parameters: "stop FiscalRestart"
+Filename: "{app}\nssm.exe"; \
+    Parameters: "remove FiscalRestart confirm"
 
 [UninstallDelete]
 Type: files; Name: "{app}\log.txt"

@@ -6,8 +6,9 @@ ADD requirements.txt epsonFiscalDriver.py /source/
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-RUN pip install -r requirements.txt \
-    && pyinstaller --clean -y --dist ./dist/windows --workpath /tmp --onefile epsonFiscalDriver.py
+RUN pip --trusted-host pypi.python.org install -r requirements.txt
+
+RUN pyinstaller --clean -y --dist ./dist/windows --workpath /tmp --onefile epsonFiscalDriver.py
 
 ENTRYPOINT ["bash"]
 
