@@ -3,8 +3,8 @@ import string
 import types
 import logging
 import unicodedata
-from fiscalGeneric import PrinterInterface, PrinterException
-import epsonFiscalDriver
+from .fiscalGeneric import PrinterInterface, PrinterException
+from . import epsonFiscalDriver
 
 class FiscalPrinterError(Exception):
     pass
@@ -25,7 +25,7 @@ class FileDriver:
 
 
 def formatText(text):
-    asciiText = unicodedata.normalize('NFKD', unicode(text)).encode('ASCII', 'ignore')
+    asciiText = unicodedata.normalize('NFKD', str(text)).encode('ASCII', 'ignore')
     asciiText = asciiText.replace("\t", " ").replace("\n", " ").replace("\r", " ")
     return asciiText
 
@@ -34,7 +34,7 @@ class DummyDriver:
 
     def __init__(self):
         try:
-            self.number = int(raw_input("Ingrese el número de la última factura: "))
+            self.number = int(input("Ingrese el número de la última factura: "))
         except EOFError:
             # iniciar desde 0 (ejecutando sin stdin)
             self.number = 0
@@ -91,7 +91,7 @@ class EpsonPrinter(PrinterInterface):
                 deviceFile = deviceFile or 0
                 self.driver = epsonFiscalDriver.EpsonFiscalDriver(deviceFile, speed)
             #self.driver = FileDriver( "/home/gnarvaja/Desktop/fiscal.txt" )
-        except Exception, e:
+        except Exception as e:
             raise FiscalPrinterError("Imposible establecer comunicación.", e)
         if not model:
             self.model = "tickeadoras"
@@ -101,13 +101,13 @@ class EpsonPrinter(PrinterInterface):
         self._currentDocumentType = None
 
     def _sendCommand(self, commandNumber, parameters, skipStatusErrors=False):
-        print "_sendCommand", commandNumber, parameters
+        print("_sendCommand", commandNumber, parameters)
         try:
             logging.getLogger().info("sendCommand: SEND|0x%x|%s|%s" % (commandNumber,
                 skipStatusErrors and "T" or "F",
                                                                      str(parameters)))
             return self.driver.sendCommand(commandNumber, parameters, skipStatusErrors)
-        except epsonFiscalDriver.PrinterException, e:
+        except epsonFiscalDriver.PrinterException as e:
             logging.getLogger().error("epsonFiscalDriver.PrinterException: %s" % str(e))
             raise PrinterException("Error de la impresora fiscal: " + str(e))
 
@@ -167,7 +167,7 @@ class EpsonPrinter(PrinterInterface):
 
     def _openBillCreditTicket(self, type, name, address, doc, docType, ivaType, isCreditNote,
             reference=None):
-        if not doc or filter(lambda x: x not in string.digits + "-.", doc or "") or not \
+        if not doc or [x for x in doc or "" if x not in string.digits + "-."] or not \
                 docType in self.docTypeNames:
             doc, docType = "", ""
         else:
@@ -281,7 +281,7 @@ class EpsonPrinter(PrinterInterface):
         raise NotImplementedError
 
     def addItem(self, description, quantity, price, iva, discount, discountDescription, negative=False):
-        if type(description) in types.StringTypes:
+        if type(description) in (str,):
             description = [description]
         if negative:
             sign = 'R'

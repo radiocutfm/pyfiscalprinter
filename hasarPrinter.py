@@ -3,8 +3,8 @@ import string
 import types
 import logging
 import unicodedata
-from fiscalGeneric import PrinterInterface, PrinterException
-import epsonFiscalDriver
+from .fiscalGeneric import PrinterInterface, PrinterException
+from . import epsonFiscalDriver
 
 
 class ValidationError(Exception):
@@ -32,7 +32,7 @@ class FileDriver:
 
 
 def formatText(text):
-    asciiText = unicodedata.normalize('NFKD', unicode(text)).encode('ASCII', 'ignore')
+    asciiText = unicodedata.normalize('NFKD', str(text)).encode('ASCII', 'ignore')
     asciiText = asciiText.replace("\t", " ").replace("\n", " ").replace("\r", " ")
     return asciiText
 
@@ -53,7 +53,7 @@ class DummyDriver:
     def sendCommand(self, commandNumber, parameters, skipStatusErrors):
         ret = ["C080", "3600", str(self.number), str(self.number), str(self.number), str(self.number),
             str(self.number), str(self.number), str(self.number), str(self.number)]
-        print "sendCommand", ret, parameters
+        print("sendCommand", ret, parameters)
         return ret
 
 
@@ -149,7 +149,7 @@ class HasarPrinter(PrinterInterface):
             else:
                 deviceFile = deviceFile or 0
                 self.driver = epsonFiscalDriver.HasarFiscalDriver(deviceFile, speed)
-        except Exception, e:
+        except Exception as e:
             raise FiscalPrinterError("Imposible establecer comunicación.", e)
         self.model = model
 
@@ -161,7 +161,7 @@ class HasarPrinter(PrinterInterface):
             ret = self.driver.sendCommand(commandNumber, parameters, skipStatusErrors)
             logging.getLogger().info("reply: %s" % ret)
             return ret
-        except epsonFiscalDriver.PrinterException, e:
+        except epsonFiscalDriver.PrinterException as e:
             logging.getLogger().error("epsonFiscalDriver.PrinterException: %s" % str(e))
             raise PrinterException("Error de la impresora fiscal: %s.\nComando enviado: %s" % \
                 (str(e), commandString))
@@ -236,7 +236,7 @@ class HasarPrinter(PrinterInterface):
         self.setHeader()
         self.setTrailer()
         doc = doc.replace("-", "").replace(".", "")
-        if doc and docType != "3" and filter(lambda x: x not in string.digits, doc):
+        if doc and docType != "3" and [x for x in doc if x not in string.digits]:
             # Si tiene letras se blanquea el DNI para evitar errores, excepto que sea
             # docType="3" (Pasaporte)
             doc, docType = " ", " "
@@ -357,7 +357,7 @@ class HasarPrinter(PrinterInterface):
         raise NotImplementedError
 
     def addItem(self, description, quantity, price, iva, discount, discountDescription, negative=False):
-        if type(description) in types.StringTypes:
+        if type(description) in (str,):
             description = [description]
         if negative:
             sign = 'm'
