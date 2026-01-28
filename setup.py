@@ -3,8 +3,13 @@
 from distutils.core import setup
 
 import sys
+import re
 
-from __init__ import __version__
+# Leer la versión del archivo __init__.py
+with open('__init__.py', 'r', encoding='latin1') as f:
+    content = f.read()
+    version_match = re.search(r'__version__\s*=\s*["\']([^"\']+)["\']', content)
+    __version__ = version_match.group(1) if version_match else "1.0.0"
     
 setup(name='pyfiscalprinter',
       version=__version__,
@@ -23,14 +28,20 @@ setup(name='pyfiscalprinter',
             "License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)",
             "Natural Language :: Spanish",
             "Programming Language :: Python",
-            "Programming Language :: Python :: 2.5",
-            "Programming Language :: Python :: 2.6",
-            "Programming Language :: Python :: 2.7",
+            "Programming Language :: Python :: 3",
+            "Programming Language :: Python :: 3.6",
+            "Programming Language :: Python :: 3.7",
+            "Programming Language :: Python :: 3.8",
+            "Programming Language :: Python :: 3.9",
+            "Programming Language :: Python :: 3.10",
+            "Programming Language :: Python :: 3.11",
+            "Programming Language :: Python :: 3.12",
             "Operating System :: OS Independent",
             "Topic :: Office/Business :: Financial :: Point-Of-Sale",
             "Topic :: Software Development :: Libraries :: Python Modules",
             "Topic :: Printing",
       ],
       keywords="fiscal printer hasar epson",
+      python_requires='>=3.6',
      )
 

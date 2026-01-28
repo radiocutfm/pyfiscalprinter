@@ -15,12 +15,12 @@
 __author__ = "Mariano Reingart <reingart@gmail.com>"
 __copyright__ = "Copyright (C) 2014 Mariano Reingart"
 __license__ = "GPL 3.0"
-from __init__ import __version__
+from .__init__ import __version__
 
 CONFIG_FILE = "fiscal.ini"
 DEBUG = True
 
-LICENCIA = u"""
+LICENCIA = """
 Interfaz para imprimir Facturas y Tickets en Controladores Fiscales
 Copyright (C) 2014 Mariano Reingart reingart@gmail.com
 
@@ -32,7 +32,7 @@ e incorporación/distribución en programas propietarios ver PyAfipWs:
 http://www.sistemasagiles.com.ar/trac/wiki/PyFiscalPrinter
 """
 
-AYUDA=u"""
+AYUDA="""
 Opciones: 
   --ayuda: este mensaje
   --licencia: muestra la licencia del programa
@@ -56,14 +56,14 @@ import json
 import os
 import sys
 import traceback
-from cStringIO import StringIO
+from io import StringIO
 from decimal import Decimal
 from functools import wraps
 
 # Drivers:
 
-from epsonFiscal import EpsonPrinter
-from hasarPrinter import HasarPrinter
+from .epsonFiscal import EpsonPrinter
+from .hasarPrinter import HasarPrinter
 
 
 try:
@@ -84,10 +84,10 @@ def inicializar_y_capturar_excepciones(func):
             # inicializo (limpio variables)
             self.Traceback = self.Excepcion = ""
             return func(self, *args, **kwargs)
-        except Exception, e:
-            ex = traceback.format_exception( sys.exc_type, sys.exc_value, sys.exc_traceback)
+        except Exception as e:
+            ex = traceback.format_exception( sys.exc_info()[0], sys.exc_info()[1], sys.exc_info()[2])
             self.Traceback = ''.join(ex)
-            self.Excepcion = traceback.format_exception_only( sys.exc_type, sys.exc_value)[0]
+            self.Excepcion = traceback.format_exception_only( sys.exc_info()[0], sys.exc_info()[1])[0]
             if self.LanzarExcepciones:
                 raise
         finally:
@@ -222,7 +222,7 @@ class PyFiscalPrinter(Object):
                                               domicilio_cliente, nro_doc, doc_fiscal, 
                                               pos_fiscal)
         elif cbte_fiscal.startswith("NC"):
-            if isinstance(referencia, unicode):
+            if isinstance(referencia, str):
                 referencia = referencia.encode("latin1", "ignore")
             ret = printer.openBillCreditTicket(letra_cbte, nombre_cliente, 
                                                domicilio_cliente, nro_doc, doc_fiscal, 
@@ -292,7 +292,7 @@ class PyFiscalPrinter(Object):
     def Subtotal(self, imprimir=True):
         "Devuelve el subtotal y lo imprime (opcional)"
         ret = self.printer.subtotal(imprimir)
-        print ret
+        print(ret)
         if len(ret) == 10:      # epson
             qty = int(ret[3])
             subtotal = str(decimal.Decimal(ret[4]) / decimal.Decimal("100.000"))
@@ -362,17 +362,17 @@ if __name__ == '__main__':
         name = dbus.service.BusName("ar.com.pyfiscalprinter.Service", session_bus)
         object = PyFiscalPrinter(session_bus, '/ar/com/pyfiscalprinter/Object')
         mainloop = gobject.MainLoop()
-        print "Running PyFiscalPrinter service."
+        print("Running PyFiscalPrinter service.")
         mainloop.run()
     else:
-        from ConfigParser import SafeConfigParser
+        from configparser import SafeConfigParser
 
         DEBUG = '--debug' in sys.argv
                 
         # leeo configuración (primer argumento o rece.ini por defecto)
         if len(sys.argv)>1 and not sys.argv[1].startswith("--"):
             CONFIG_FILE = sys.argv.pop(1)
-        if DEBUG: print "CONFIG_FILE:", CONFIG_FILE
+        if DEBUG: print("CONFIG_FILE:", CONFIG_FILE)
         
         config = SafeConfigParser()
         config.read(CONFIG_FILE)
@@ -382,11 +382,11 @@ if __name__ == '__main__':
             conf = {}
 
         if '--ayuda' in sys.argv:
-            print AYUDA
+            print(AYUDA)
             sys.exit(0)
 
         if '--licencia' in sys.argv:
-            print LICENCIA
+            print(LICENCIA)
             sys.exit(0)
             
         controlador = PyFiscalPrinter()
@@ -410,18 +410,18 @@ if __name__ == '__main__':
             if i+1 < len(sys.argv):
                tipo = sys.argv[i+1]
             else:
-               tipo = raw_input("Tipo de cierre: ") or "Z"
-            print "CierreDiario:", controlador.CierreDiario(tipo.upper())
+               tipo = input("Tipo de cierre: ") or "Z"
+            print("CierreDiario:", controlador.CierreDiario(tipo.upper()))
         
         elif '--ult' in sys.argv:
-            print "Consultar ultimo numero:"
+            print("Consultar ultimo numero:")
             i = sys.argv.index("--ult")
             if i+1 < len(sys.argv):
                tipo_cbte = int(sys.argv[i+1])
             else:
-               tipo_cbte = int(raw_input("Tipo de comprobante: ") or 83)
+               tipo_cbte = int(input("Tipo de comprobante: ") or 83)
             ult = controlador.ConsultarUltNro(tipo_cbte)
-            print "Ultimo Nro de Cbte:", ult
+            print("Ultimo Nro de Cbte:", ult)
 
         elif '--prueba' in sys.argv:
             # creo una factura de ejemplo
@@ -471,15 +471,15 @@ if __name__ == '__main__':
                 ok = controlador.ImprimirPago(**pago)
             ok = controlador.CerrarComprobante()
             if ok:
-                print "Nro. Cbte. impreso:", controlador.factura["nro_cbte"]
+                print("Nro. Cbte. impreso:", controlador.factura["nro_cbte"])
                 if "subtotal" in factura:
-                    print "Cant.Articulos:", controlador.factura["qty"]
-                    print "Subtotal:", controlador.factura["subtotal"]  
-                    print "IVA liq.:", controlador.factura["imp_iva"]
+                    print("Cant.Articulos:", controlador.factura["qty"])
+                    print("Subtotal:", controlador.factura["subtotal"])  
+                    print("IVA liq.:", controlador.factura["imp_iva"])
 
             with open(conf.get("salida", "factura.json"), "w") as f:
                 f = codecs.getwriter(conf.get("encoding", "utf8"))(f)
                 json.dump(controlador.factura, f, 
                           indent=4, separators=(',', ': '))
-            print "Hecho."
+            print("Hecho.")
 

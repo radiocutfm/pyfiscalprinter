@@ -14,19 +14,19 @@ class EpsonFiscalDriverService(win32serviceutil.ServiceFramework):
     def SvcDoRun(self):
         import servicemanager
 
-	from epsonFiscalDriver import socketServer
+        from .epsonFiscalDriver import socketServer
 
         servicemanager.LogInfoMsg("epsonFiscalDriver - Iniciando Servidor")
-	self.server = socketServer("Hasar", "", 12345, "COM1", 9600, 60, True)
+        self.server = socketServer("Hasar", "", 12345, "COM1", 9600, 60, True)
         servicemanager.LogInfoMsg("epsonFiscalDriver - Servidor Construido, sirviendo eternamente")
-	self.server.serve_forever()
+        self.server.serve_forever()
 
     def SvcStop(self):
         import servicemanager
 
         servicemanager.LogInfoMsg("epsonFiscalDriver - Deteniendo el servicio")
         self.ReportServiceStatus(win32service.SERVICE_STOP_PENDING)
-	self.server.shutdown()
+        self.server.shutdown()
 
 if __name__ == '__main__':
     win32serviceutil.HandleCommandLine(EpsonFiscalDriverService)
